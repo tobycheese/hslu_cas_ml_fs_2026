@@ -1,0 +1,43 @@
+# Pinned image versions (2026-08-25):
+#   prom/statsd-exporter   v0.30.0
+#   prom/prometheus        v3.14.0
+#   grafana/grafana        13.2.0
+services:
+  statsd:
+    container_name: statsd
+    # v0.30.0
+    image: prom/statsd-exporter@sha256:378cb79c4ac7d6941e5ed71b1f3cd6f4707cf42c72c104ffe81fa4d9026ef659
+    expose:
+    - 8125:8125/udp
+    ports:
+    - 127.0.0.1:9102:9102
+    command:
+    - --statsd.mapping-config=/metrics-mapping.yml
+    - --statsd.listen-udp=:8125
+    - --web.listen-address=:9102
+    volumes:
+    - ../../prometheus_config/statsd_metrics-mapping.yml:/metrics-mapping.yml
+    networks:
+    - production
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:v3.14.0@sha256:5ce7540c3c00ef4ab0c9d2c995c6a5b9c421f44b4a115d97a2c7af3b1c21cbb0
+    ports:
+      - 127.0.0.1:9090:9090 
+    volumes:
+      - ../../prometheus_config:/etc/prometheus
+    networks:
+      - production
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:13.2.0@sha256:3fd54ae1214669f8355f065ec9f6445d5279a3d77095ab048ca045685272429b
+    ports:
+      - 127.0.0.1:3000:3000 
+    volumes:
+      - ../../grafana_work/etc:/etc/grafana/
+      - ../../grafana_work/data:/var/lib/grafana
+      - ../../grafana_work/dashboards:/opt/grafana/dashboards
+    networks:
+      - production
